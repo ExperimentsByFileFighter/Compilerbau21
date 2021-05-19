@@ -1,13 +1,16 @@
 package compilerbau21.compiler;
 
 import compilerbau21.compiler.logicalexpression.LogicalExpressionReader;
-import compilerbau21.compiler.logicalexpression.instructions.*;
+import compilerbau21.compiler.logicalexpression.LogicalExpressionReaderInterface;
+import compilerbau21.compiler.logicalexpression.instructions.BitNot;
+import compilerbau21.compiler.logicalexpression.instructions.Not;
 
 public class ExprReader extends ExprReaderIntf {
-
+    private final LogicalExpressionReaderInterface logicalExpressionReader;
 
     public ExprReader(SymbolTable symbolTable, LexerIntf lexer, CompileEnvIntf compileEnv) throws Exception {
         super(symbolTable, lexer, compileEnv);
+        logicalExpressionReader = new LogicalExpressionReader(lexer, compileEnv, this);
     }
 
     /**
@@ -16,7 +19,7 @@ public class ExprReader extends ExprReaderIntf {
      * @throws Exception
      */
     public void getExpr() throws Exception {
-        getLogicalOrExpression();
+        logicalExpressionReader.getLogicalOrExpression();
     }
 
     public void getAtomicExpr() throws Exception {
@@ -107,68 +110,6 @@ public class ExprReader extends ExprReaderIntf {
                 // add instruction to code block
                 m_compileEnv.addInstr(subInstr);
             }
-            token = m_lexer.lookAheadToken();
-        }
-    }
-
-    /**
-     * checks for OR and creates instruction
-     * calls AND
-     *
-     * @throws Exception
-     */
-    public void getLogicalOrExpression() throws Exception {
-        getLogicalAnd();
-        Token token = m_lexer.lookAheadToken();
-        while (token.m_type == Token.Type.OR) {
-            m_lexer.advance();
-            getLogicalAnd();
-            InstrIntf orInstr = new Or();
-            // add instruction to code block
-            m_compileEnv.addInstr(orInstr);
-            token = m_lexer.lookAheadToken();
-        }
-    }
-
-    /**
-     * checks for AND
-     * calls Bitwise OR
-     */
-    public void getLogicalAnd() throws Exception {
-        getBitwiseOr();
-        Token token = m_lexer.lookAheadToken();
-        while (token.m_type == TokenIntf.Type.AND) {
-            m_lexer.advance();
-            getBitwiseOr();
-            InstrIntf andInstruction = new And();
-            // add instruction to code block
-            m_compileEnv.addInstr(andInstruction);
-            token = m_lexer.lookAheadToken();
-        }
-    }
-
-    public void getBitwiseOr() throws Exception {
-        getBitwiseAnd();
-        Token token = m_lexer.lookAheadToken();
-        while (token.m_type == TokenIntf.Type.BITOR) {
-            m_lexer.advance();
-            getBitwiseAnd();
-            InstrIntf andInstruction = new BitOr();
-            // add instruction to code block
-            m_compileEnv.addInstr(andInstruction);
-            token = m_lexer.lookAheadToken();
-        }
-    }
-
-    public void getBitwiseAnd() throws Exception {
-        getSum();
-        Token token = m_lexer.lookAheadToken();
-        while (token.m_type == TokenIntf.Type.BITAND) {
-            m_lexer.advance();
-            getSum();
-            InstrIntf andInstruction = new BitAnd();
-            // add instruction to code block
-            m_compileEnv.addInstr(andInstruction);
             token = m_lexer.lookAheadToken();
         }
     }

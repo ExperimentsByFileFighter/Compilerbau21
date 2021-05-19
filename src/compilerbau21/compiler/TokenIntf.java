@@ -1,6 +1,6 @@
 package compilerbau21.compiler;
 
-abstract class TokenIntf {
+public abstract class TokenIntf {
 	public enum Type {
 		EOF,
 		IDENT,
