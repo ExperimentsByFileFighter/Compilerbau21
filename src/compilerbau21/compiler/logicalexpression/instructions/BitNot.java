@@ -5,8 +5,7 @@ import compilerbau21.compiler.InstrIntf;
 
 import java.io.OutputStreamWriter;
 
-public class BitWiseAnd implements InstrIntf {
-
+public class BitNot implements InstrIntf {
     /**
      * execute this instruction
      *
@@ -14,12 +13,8 @@ public class BitWiseAnd implements InstrIntf {
      */
     @Override
     public void execute(ExecutionEnvIntf env) {
-        // pop operand 1 from value stack
-        int op1 = env.popNumber();
-        // pop operand 0 from value stack
         int op0 = env.popNumber();
-        // execute BitWiseAnd
-        env.pushNumber(op0 & op1);
+        env.pushNumber(~op0);
     }
 
     /**
@@ -29,6 +24,6 @@ public class BitWiseAnd implements InstrIntf {
      */
     @Override
     public void trace(OutputStreamWriter os) throws Exception {
-        os.write("BITAND\n");
+        os.write("BITNOT\n");
     }
 }

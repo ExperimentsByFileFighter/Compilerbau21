@@ -1,9 +1,7 @@
 package compilerbau21.compiler;
 
-import compilerbau21.compiler.logicalexpression.instructions.And;
-import compilerbau21.compiler.logicalexpression.instructions.BitWiseAnd;
-import compilerbau21.compiler.logicalexpression.instructions.BitWiseOr;
-import compilerbau21.compiler.logicalexpression.instructions.Or;
+import compilerbau21.compiler.logicalexpression.LogicalExpressionReader;
+import compilerbau21.compiler.logicalexpression.instructions.*;
 
 public class ExprReader extends ExprReaderIntf {
 
@@ -46,34 +44,44 @@ public class ExprReader extends ExprReaderIntf {
         // return number;
     }
 
-    // compile time des Programs
+    /**
+     * Grammar
+     * unary : atomic
+     * unary : [!~-] atomic
+     *
+     * @throws Exception
+     */
     public void getUnaryExpr() throws Exception {
-        getAtomicExpr();
+
         Token token = m_lexer.lookAheadToken();
-        while (token.m_type == Token.Type.MINUS) {
-            m_lexer.advance();
-            // create unary minus instruction
-            InstrIntf unaryMinusInstr = new Instr.UnaryMinusInstr();
-            // add instruction to code block
-            m_compileEnv.addInstr(unaryMinusInstr);
-            token = m_lexer.lookAheadToken();
+        if (!(token.m_type == TokenIntf.Type.MINUS || token.m_type == TokenIntf.Type.BITNOT || token.m_type == TokenIntf.Type.NOT)) {
+            getAtomicExpr();
+            return;
         }
+        m_lexer.advance();
+        // create instruction and store it.
+        InstrIntf instruction = switch (token.m_type) {
+            case MINUS -> new Instr.UnaryMinusInstr();
+            case BITNOT -> new BitNot();
+            case NOT -> new Not();
+            default -> null;
+        };
+        // add instruction to code block
+        getUnaryExpr();
+        m_compileEnv.addInstr(instruction);
     }
 
     public void getProduct() throws Exception {
-        // int number = getUnaryExpr();
         getUnaryExpr();
         Token token = m_lexer.lookAheadToken();
         while (token.m_type == Token.Type.MUL || token.m_type == Token.Type.DIV) {
             m_lexer.advance();
             if (token.m_type == Token.Type.MUL) {
-                // number *= getUnaryExpr();
                 getUnaryExpr();
                 InstrIntf mulInstr = new Instr.MultiplyInstr();
                 // add instruction to code block
                 m_compileEnv.addInstr(mulInstr);
             } else {
-                // number /= getUnaryExpr();
                 getUnaryExpr();
                 InstrIntf divInstr = new Instr.DivisionInstr();
                 // add instruction to code block
@@ -81,7 +89,6 @@ public class ExprReader extends ExprReaderIntf {
             }
             token = m_lexer.lookAheadToken();
         }
-        // return number;
     }
 
     public void getSum() throws Exception {
@@ -146,7 +153,7 @@ public class ExprReader extends ExprReaderIntf {
         while (token.m_type == TokenIntf.Type.BITOR) {
             m_lexer.advance();
             getBitwiseAnd();
-            InstrIntf andInstruction = new BitWiseOr();
+            InstrIntf andInstruction = new BitOr();
             // add instruction to code block
             m_compileEnv.addInstr(andInstruction);
             token = m_lexer.lookAheadToken();
@@ -159,7 +166,7 @@ public class ExprReader extends ExprReaderIntf {
         while (token.m_type == TokenIntf.Type.BITAND) {
             m_lexer.advance();
             getSum();
-            InstrIntf andInstruction = new BitWiseAnd();
+            InstrIntf andInstruction = new BitAnd();
             // add instruction to code block
             m_compileEnv.addInstr(andInstruction);
             token = m_lexer.lookAheadToken();
