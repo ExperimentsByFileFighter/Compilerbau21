@@ -1,13 +1,14 @@
 package compilerbau21.test;
 
 import compilerbau21.compiler.CompileEnv;
+import compilerbau21.compiler.FileReaderIntf;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 
-public class InterpreterTest implements compilerbau21.test.TestCaseIntf {
-
-    public String executeTest(compilerbau21.compiler.FileReaderIntf fileReader) throws Exception {
+public class LogicalExpressionsTest implements TestCaseIntf {
+    @Override
+    public String executeTest(FileReaderIntf fileReader) throws Exception {
         CompileEnv compiler = new CompileEnv(fileReader, false);
         compiler.compile();
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
