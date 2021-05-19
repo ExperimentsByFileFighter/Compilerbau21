@@ -135,6 +135,9 @@ public class Lexer implements LexerIntf {
         if (firstChar == '!') {
             return Token.Type.NOT;
         }
+        if (firstChar == '^') {
+            return Token.Type.BITXOR;
+        }
         if (firstChar == ',') {
             return Token.Type.COMMA;
         }

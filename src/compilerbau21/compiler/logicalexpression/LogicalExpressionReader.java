@@ -1,10 +1,7 @@
 package compilerbau21.compiler.logicalexpression;
 
 import compilerbau21.compiler.*;
-import compilerbau21.compiler.logicalexpression.instructions.And;
-import compilerbau21.compiler.logicalexpression.instructions.BitAnd;
-import compilerbau21.compiler.logicalexpression.instructions.BitOr;
-import compilerbau21.compiler.logicalexpression.instructions.Or;
+import compilerbau21.compiler.logicalexpression.instructions.*;
 
 public class LogicalExpressionReader implements LogicalExpressionReaderInterface {
 
@@ -34,6 +31,7 @@ public class LogicalExpressionReader implements LogicalExpressionReaderInterface
      * ^ this is already implemented
      * -----------------------------
      * 7 &
+     * 6 ^ (bitxor)
      * 5 |
      * 4 &&
      * 3 ||
@@ -53,12 +51,25 @@ public class LogicalExpressionReader implements LogicalExpressionReaderInterface
      */
     @Override
     public void getLogicalOrExpression() throws Exception {
-        this.getLogicalAnd();
+        getLogicalBitXorExpression();
         Token token = lexer.lookAheadToken();
         while (token.m_type == Token.Type.OR) {
             lexer.advance();
-            this.getLogicalAnd();
+            this.getLogicalBitXorExpression();
             InstrIntf orInstr = new Or();
+            // add instruction to code block
+            compilerEnv.addInstr(orInstr);
+            token = lexer.lookAheadToken();
+        }
+    }
+
+    private void getLogicalBitXorExpression() throws Exception {
+        getLogicalAnd();
+        Token token = lexer.lookAheadToken();
+        while (token.m_type == Token.Type.BITXOR) {
+            lexer.advance();
+            this.getLogicalAnd();
+            InstrIntf orInstr = new BitXor();
             // add instruction to code block
             compilerEnv.addInstr(orInstr);
             token = lexer.lookAheadToken();
